@@ -2,6 +2,8 @@
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.IO;
 
 [assembly: FunctionsStartup(typeof(MyNamespace.Startup))]
 
@@ -11,16 +13,12 @@ namespace MyNamespace
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            //builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            //{
-            //    options.UseSqlite("Data Source=./data.db",
-            //        b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
-            //});
-
+            var home = Environment.GetEnvironmentVariable("HOME") ?? "";
+            var databasePath = Path.Combine(home, "data.db");
 
             builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
             {
-                options.UseSqlite("Data Source=data.db");
+                options.UseSqlite($"Data Source={databasePath}");
             });
 
         }
