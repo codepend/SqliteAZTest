@@ -20,8 +20,9 @@
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.1.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Shared\SharedLibrary.csproj" />
+    <ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj" />
   </ItemGroup>
+ 
   <ItemGroup>
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
