@@ -26,7 +26,7 @@ namespace Api
         [FunctionName("GetAllPeople")]
         public async Task<IActionResult> GetAllPeople(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
-            [Blob("data/data.json", FileAccess.Read, Connection = "DbStorage")] string myBlob,
+            [Blob("data/data.json", FileAccess.Read, Connection = "DbStorage")] string peopleString,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -41,7 +41,7 @@ namespace Api
 
             //myBlob.Write(System.Text.Encoding.UTF8.GetBytes(json));
 
-            var people = JsonConvert.DeserializeObject<List<Person>>(myBlob);
+            var people = JsonConvert.DeserializeObject<List<Person>>(peopleString);
             
             return new OkObjectResult(people);
         }
