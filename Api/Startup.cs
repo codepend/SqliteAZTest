@@ -14,6 +14,8 @@ namespace MyNamespace
         public override void Configure(IFunctionsHostBuilder builder)
         {
             var home = Environment.GetEnvironmentVariable("HOME") ?? "";
+            
+            //var home = Environment.GetEnvironmentVariable("HOME");
             var databasePath = Path.Combine(home, "data.db");
 
             builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
