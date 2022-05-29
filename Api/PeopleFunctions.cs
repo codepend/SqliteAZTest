@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore;
 using Api.Data;
 using SharedLibrary;
 using System.Collections.Generic;
+using Microsoft.Azure.Management.Storage.Models;
+using Azure.Storage.Blobs;
+using Api.Helpers;
 
 namespace Api
 {
@@ -48,22 +51,20 @@ namespace Api
         [FunctionName("AddPerson")]
         public async Task<IActionResult> AddPerson(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-              [Blob("data/data.json", FileAccess.Read, Connection = "DbStorage")] string peopleString,
-                [Blob("data/data.json", FileAccess.Write, Connection = "DbStorage")] Stream myBlob,
+            [Blob("data/data.json", FileAccess.Read, Connection = "DbStorage")] string peopleString,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
             var body = await new StreamReader(req.Body).ReadToEndAsync();
             var person = JsonConvert.DeserializeObject<Person>(body);
 
-            //using var context = _dbContextFactory.CreateDbContext();
-
-            //await context.People.AddAsync(person);
-            //await context.SaveChangesAsync();
+            var fileName = "data.json";
+            var containerName = "data";
+                      
             var people = JsonConvert.DeserializeObject<List<Person>>(peopleString);
             people.Add(person);
-            var json = JsonConvert.SerializeObject(people);
-            myBlob.Write(System.Text.Encoding.UTF8.GetBytes(json));
+
+            await BlobHelper.WriteListAsJsonToBlob(fileName, containerName, people);
 
             return new OkObjectResult(person);
         }
