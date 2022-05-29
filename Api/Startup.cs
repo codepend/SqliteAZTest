@@ -1,4 +1,5 @@
 ﻿using Api.Data;
+using Api.Helpers;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,16 +14,16 @@ namespace MyNamespace
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            var home = Environment.GetEnvironmentVariable("HOME") ?? "";
-            
-            //var home = Environment.GetEnvironmentVariable("HOME");
-            var databasePath = Path.Combine(home, "data.db");
+            //var home = Environment.GetEnvironmentVariable("HOME") ?? "";
 
-            builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-            {
-                options.UseSqlite($"Data Source={databasePath}");
-            });
+            ////var home = Environment.GetEnvironmentVariable("HOME");
+            //var databasePath = Path.Combine(home, "data.db");
 
+            //builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
+            //{
+            //    options.UseSqlite($"Data Source={databasePath}");
+            //});
+            builder.Services.AddSingleton<BlobHelper>();
         }
     }
 }

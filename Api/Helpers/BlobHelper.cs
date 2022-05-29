@@ -12,7 +12,7 @@ namespace Api.Helpers
 {
     public class BlobHelper
     {
-        public static async Task WriteListAsJsonToBlob<T>(string fileName, string containerName, List<T> list) 
+        public async Task WriteListAsJsonToBlob<T>(string fileName, string containerName, List<T> list) 
         {
             var blobClient = GetBlobClient(fileName, containerName);
             var json = JsonConvert.SerializeObject(list);
@@ -21,13 +21,13 @@ namespace Api.Helpers
             await blobClient.UploadAsync(stream, true);
         }
 
-        public static async Task<List<T>> GetJsonListFromBlob<T>(string fileName, string containerName)
+        public async Task<List<T>> GetJsonListFromBlob<T>(string fileName, string containerName)
         {
             var output = await DownloadFileAsString(fileName, containerName);
             return JsonConvert.DeserializeObject<List<T>>(output);
         }
 
-        public static async Task<string> DownloadFileAsString(string fileName, string containerName)
+        public async Task<string> DownloadFileAsString(string fileName, string containerName)
         {
             var blobClient = GetBlobClient(fileName, containerName);
             if (await blobClient.ExistsAsync())
@@ -41,7 +41,7 @@ namespace Api.Helpers
             return string.Empty;
         }
 
-        private static BlobClient GetBlobClient(string fileName, string containerName)
+        private BlobClient GetBlobClient(string fileName, string containerName)
         {
             var connectionString = Environment.GetEnvironmentVariable("DbStorage");
             BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);

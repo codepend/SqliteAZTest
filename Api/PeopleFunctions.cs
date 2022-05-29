@@ -22,6 +22,12 @@ namespace Api
     {
         private readonly string _containerName = "data";
         private readonly string _fileName = "data.json";
+        private readonly BlobHelper _blobHelper;
+
+        public PeopleFunctions(BlobHelper blobHelper)
+        {
+            _blobHelper = blobHelper;
+        }
 
         [FunctionName("GetAllPeople")]
         public async Task<IActionResult> GetAllPeople(
@@ -30,7 +36,7 @@ namespace Api
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            var people = await BlobHelper.GetJsonListFromBlob<Person>(_fileName, _containerName);
+            var people = await _blobHelper.GetJsonListFromBlob<Person>(_fileName, _containerName);
             
             return new OkObjectResult(people);
         }
@@ -43,10 +49,10 @@ namespace Api
             var body = await new StreamReader(req.Body).ReadToEndAsync();
             var newPerson = JsonConvert.DeserializeObject<Person>(body);
 
-            var people = await BlobHelper.GetJsonListFromBlob<Person>(_fileName, _containerName);
+            var people = await _blobHelper.GetJsonListFromBlob<Person>(_fileName, _containerName);
             people.Add(newPerson);
 
-            await BlobHelper.WriteListAsJsonToBlob(_fileName, _containerName, people);
+            await _blobHelper.WriteListAsJsonToBlob(_fileName, _containerName, people);
 
             return new OkObjectResult(newPerson);
         }
