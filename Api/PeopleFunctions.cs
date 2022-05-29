@@ -17,56 +17,38 @@ using Api.Helpers;
 
 namespace Api
 {
+    
     public class PeopleFunctions
     {
-        private readonly IDbContextFactory<ApplicationDbContext> _dbContextFactory;
-
-        public PeopleFunctions(IDbContextFactory<ApplicationDbContext> dbContextFactory)
-        {
-            _dbContextFactory = dbContextFactory;
-        }
+        private readonly string _containerName = "data";
+        private readonly string _fileName = "data.json";
 
         [FunctionName("GetAllPeople")]
         public async Task<IActionResult> GetAllPeople(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
-            [Blob("data/data.json", FileAccess.Read, Connection = "DbStorage")] string peopleString,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            //using var context = _dbContextFactory.CreateDbContext();
-
-            //await context.Database.EnsureCreatedAsync();
-
-            //var people = await context.People.ToListAsync();
-
-            //var json = JsonConvert.SerializeObject(people);
-
-            //myBlob.Write(System.Text.Encoding.UTF8.GetBytes(json));
-
-            var people = JsonConvert.DeserializeObject<List<Person>>(peopleString);
+            var people = await BlobHelper.GetJsonListFromBlob<Person>(_fileName, _containerName);
             
             return new OkObjectResult(people);
         }
         [FunctionName("AddPerson")]
         public async Task<IActionResult> AddPerson(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-            [Blob("data/data.json", FileAccess.Read, Connection = "DbStorage")] string peopleString,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
             var body = await new StreamReader(req.Body).ReadToEndAsync();
-            var person = JsonConvert.DeserializeObject<Person>(body);
+            var newPerson = JsonConvert.DeserializeObject<Person>(body);
 
-            var fileName = "data.json";
-            var containerName = "data";
-                      
-            var people = JsonConvert.DeserializeObject<List<Person>>(peopleString);
-            people.Add(person);
+            var people = await BlobHelper.GetJsonListFromBlob<Person>(_fileName, _containerName);
+            people.Add(newPerson);
 
-            await BlobHelper.WriteListAsJsonToBlob(fileName, containerName, people);
+            await BlobHelper.WriteListAsJsonToBlob(_fileName, _containerName, people);
 
-            return new OkObjectResult(person);
+            return new OkObjectResult(newPerson);
         }
     }
 }
